@@ -3,6 +3,7 @@ import {
   applyMove,
   boardFromRows,
   boardContains,
+  createReadyState,
   hasAvailableMoves,
   moveBoard,
   startGame,
@@ -96,6 +97,16 @@ function runTests(): void {
   );
   assert.equal(blocked.status, 'READY');
   assert.equal(blocked.score, 10);
+
+  const ready = createReadyState();
+  assert.deepEqual(ready.board, [
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+  ]);
+  assert.equal(ready.score, 0);
+  assert.equal(ready.status, 'READY');
 
   console.log('Verified 2048 game logic.');
 }

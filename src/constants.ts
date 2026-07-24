@@ -18,6 +18,7 @@ export const FIELD_NAMES = {
   score: 'score',
   message: 'message',
   start: 'start',
+  reset: 'reset',
   up: 'up',
   down: 'down',
   left: 'left',

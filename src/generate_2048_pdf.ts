@@ -30,7 +30,11 @@ import {
   PAGE_WIDTH,
   TEXT_COLOR,
 } from './constants.js';
-import {buildDirectionScript, buildStartScript} from './game_script.js';
+import {
+  buildDirectionScript,
+  buildResetScript,
+  buildStartScript,
+} from './game_script.js';
 
 type TextFieldOptions = {
   name: string;
@@ -286,7 +290,17 @@ function addGameButtons(pdfDoc: PDFDocument): void {
     CONTROL_LEFT,
     320,
     buildStartScript(),
-    294,
+    192,
+    38,
+  );
+  addButton(
+    pdfDoc,
+    FIELD_NAMES.reset,
+    'RESET',
+    CONTROL_LEFT + 202,
+    320,
+    buildResetScript(),
+    92,
     38,
   );
   addButton(pdfDoc, FIELD_NAMES.up, 'UP', CONTROL_LEFT + 118, 263, buildDirectionScript('UP'), 58, 28);
@@ -335,6 +349,7 @@ async function verify(outputPath: string): Promise<void> {
     FIELD_NAMES.score,
     FIELD_NAMES.message,
     FIELD_NAMES.start,
+    FIELD_NAMES.reset,
     FIELD_NAMES.up,
     FIELD_NAMES.down,
     FIELD_NAMES.left,
@@ -364,6 +379,7 @@ async function verify(outputPath: string): Promise<void> {
     'pdf2048MergeLine',
     'pdf2048AddRandomTile',
     'pdf2048Render',
+    'resetGame2048',
     "return 'CLEAR!'",
     "return 'FAILED'",
   ];

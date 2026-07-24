@@ -36,7 +36,8 @@ Open that file in Chrome desktop PDF viewer, click START, and use UP, DOWN, LEFT
 - A successful move adds one new tile.
 - Creating 2048 shows CLEAR! and stops the game.
 - If no legal move remains, the game shows FAILED.
-- START / RETRY resets the board from any state.
+- START / RETRY starts a new game with two tiles.
+- RESET clears the board, score, and message back to READY.
 
 The PDF uses a static board background. Runtime JavaScript changes only the text values of the cell fields and the score/message fields. It does not depend on runtime fillColor changes or timers.
 

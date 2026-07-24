@@ -199,6 +199,13 @@ if (typeof pdf2048Ready === 'undefined') {
     pdf2048Render.call(this);
   }
 
+  function resetGame2048() {
+    pdf2048Board = pdf2048EmptyBoard();
+    pdf2048Score = 0;
+    pdf2048State = 'READY';
+    pdf2048Render.call(this);
+  }
+
   function move2048(direction) {
     if (pdf2048State !== 'RUNNING') {
       return;
@@ -237,5 +244,11 @@ startGame2048.call(this);
 export function buildDirectionScript(direction: Direction): string {
   return `${buildRuntime()}
 move2048.call(this, ${quote(direction)});
+`;
+}
+
+export function buildResetScript(): string {
+  return `${buildRuntime()}
+resetGame2048.call(this);
 `;
 }

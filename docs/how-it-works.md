@@ -20,6 +20,7 @@ The PDF contains these controls:
 - `score`: current score
 - `message`: READY, RUNNING, CLEAR!, or FAILED
 - `start`: starts or retries the game
+- `reset`: clears the board and returns to READY
 - `up`, `down`, `left`, `right`: perform one move
 
 The buttons contain small JavaScript actions. Every action first makes sure the shared runtime exists, then calls the relevant game function.
@@ -33,6 +34,8 @@ The runtime keeps these values in the PDF JavaScript context:
 - current status
 
 The READY board is empty. START creates a new board and places two random tiles, then changes the status to RUNNING. Direction buttons are ignored until the game is running.
+
+RESET is different from START / RETRY: it clears every cell, sets the score to 0, and leaves the PDF in READY state without creating random tiles.
 
 ## Moving and merging
 
