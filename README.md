@@ -6,6 +6,12 @@ It uses a 4 by 4 static PDF grid, read-only AcroForm text fields, and embedded P
 
 Works best in Chrome desktop PDF viewer.
 
+<p align="center">
+  <img src="assets/Animation.gif" alt="PDF 2048 gameplay demo" width="900">
+</p>
+
+The animation above shows the playable PDF in action.
+
 ## Install
 
 ```bash
