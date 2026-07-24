@@ -1,5 +1,7 @@
 export const BOARD_SIZE = 4;
 export const TARGET_TILE = 2048;
+export const TERMINAL_BLINK_INTERVAL_MS = 180;
+export const TERMINAL_BLINK_FRAMES = 6;
 
 export const PAGE_WIDTH = 900;
 export const PAGE_HEIGHT = 506;

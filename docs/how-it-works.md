@@ -19,7 +19,7 @@ The PDF contains these controls:
 
 - `score`: current score
 - `message`: READY, RUNNING, CLEAR!, or FAILED
-- `start`: starts or retries the game
+- `start`: starts the game, then changes its caption to RESTART
 - `reset`: clears the board and returns to READY
 - `up`, `down`, `left`, `right`: perform one move
 
@@ -33,9 +33,9 @@ The runtime keeps these values in the PDF JavaScript context:
 - score
 - current status
 
-The READY board is empty. START creates a new board and places two random tiles, then changes the status to RUNNING. Direction buttons are ignored until the game is running.
+The READY board is empty. START creates a new board and places two random tiles, then changes the status to RUNNING and the button caption to RESTART. Direction buttons are ignored until the game is running.
 
-RESET is different from START / RETRY: it clears every cell, sets the score to 0, and leaves the PDF in READY state without creating random tiles.
+RESET clears every cell, sets the score to 0, restores the READY state, and changes the main button caption back to START without creating random tiles.
 
 ## Moving and merging
 
@@ -53,9 +53,9 @@ If the board did not change, no new tile is created. If the board did change, on
 
 ## WIN and GAME_OVER
 
-If a move creates a tile of 2048 or higher, the state becomes WIN immediately and the message field displays CLEAR!. The final board and score remain visible, and direction buttons stop changing the game. START / RETRY begins a fresh game.
+If a move creates a tile of 2048 or higher, the state becomes WIN immediately and the message field displays CLEAR!. The numbered cells blink briefly, then the final board and score remain visible. Direction buttons stop changing the game. RESTART begins a fresh game.
 
-If the board has no empty cells and no adjacent equal values, the state becomes GAME_OVER and the message field displays FAILED. The final board and score remain visible, and START / RETRY can be used to restart.
+If the board has no empty cells and no adjacent equal values, the state becomes GAME_OVER and the message field displays FAILED. The numbered cells blink briefly, then the final board and score remain visible. RESTART can be used to restart.
 
 The MVP intentionally uses a small message field instead of a long status field or a board-clearing end screen. This preserves the final board so the winning or losing position can still be inspected.
 

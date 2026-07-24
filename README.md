@@ -27,7 +27,7 @@ generated/playable-pdf-2048.pdf
 If a browser has cached an earlier copy, try the fresh compatibility alias
 `generated/playable-pdf-2048-fixed.pdf`.
 
-Open that file in Chrome desktop PDF viewer, click START, and use UP, DOWN, LEFT, and RIGHT. Each button press performs one move. Matching neighboring numbers merge and increase the score.
+Open that file in Chrome desktop PDF viewer, click START, and use UP, DOWN, LEFT, and RIGHT. The button changes to RESTART after the game begins. Each button press performs one move. Matching neighboring numbers merge and increase the score.
 
 ## Game rules
 
@@ -36,10 +36,11 @@ Open that file in Chrome desktop PDF viewer, click START, and use UP, DOWN, LEFT
 - A successful move adds one new tile.
 - Creating 2048 shows CLEAR! and stops the game.
 - If no legal move remains, the game shows FAILED.
-- START / RETRY starts a new game with two tiles.
+- START begins a new game and changes to RESTART. RESTART starts a new game with two tiles.
 - RESET clears the board, score, and message back to READY.
+- CLEAR! and FAILED briefly blink the numbered cells before leaving the final board visible.
 
-The PDF uses a static board background. Runtime JavaScript changes only the text values of the cell fields and the score/message fields. It does not depend on runtime fillColor changes or timers.
+The PDF uses a static board background. Runtime JavaScript changes only the text values of the cell fields and the score/message fields. It does not depend on runtime fillColor changes. A short PDF timer is used only for the terminal CLEAR!/FAILED blink.
 
 ## Test
 

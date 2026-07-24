@@ -1,4 +1,9 @@
-import {BOARD_SIZE, TARGET_TILE} from './constants.js';
+import {
+  BOARD_SIZE,
+  TARGET_TILE,
+  TERMINAL_BLINK_FRAMES,
+  TERMINAL_BLINK_INTERVAL_MS,
+} from './constants.js';
 import type {Direction} from './game_logic.js';
 
 function quote(value: string): string {
@@ -12,12 +17,38 @@ if (typeof pdf2048Ready === 'undefined') {
   var pdf2048State = 'READY';
   var pdf2048Score = 0;
   var pdf2048Board = [];
+  var pdf2048Document = this;
+  var pdf2048BlinkTimer = null;
+  var pdf2048BlinkFrame = 0;
 
   function pdf2048SetField(name, value) {
     var field = this.getField(name);
     if (field) {
       field.value = String(value);
     }
+  }
+
+  function pdf2048SetStartCaption(caption) {
+    var field = pdf2048Document.getField('start');
+    if (field && typeof field.buttonSetCaption === 'function') {
+      try {
+        field.buttonSetCaption(caption);
+      } catch (error) {
+        // Some PDF viewers expose button actions without dynamic captions.
+      }
+    }
+  }
+
+  function pdf2048ClearBlinkTimer() {
+    if (pdf2048BlinkTimer !== null && typeof app !== 'undefined' &&
+        typeof app.clearInterval === 'function') {
+      try {
+        app.clearInterval(pdf2048BlinkTimer);
+      } catch (error) {
+        // Ignore viewers that do not expose timer cleanup.
+      }
+    }
+    pdf2048BlinkTimer = null;
   }
 
   function pdf2048EmptyBoard() {
@@ -179,30 +210,66 @@ if (typeof pdf2048Ready === 'undefined') {
     return pdf2048State;
   }
 
-  function pdf2048Render() {
+  function pdf2048RenderBoard(showValues) {
     for (var row = 0; row < ${BOARD_SIZE}; row += 1) {
       for (var col = 0; col < ${BOARD_SIZE}; col += 1) {
         var value = pdf2048Board[row][col];
-        pdf2048SetField.call(this, 'cell_' + row + '_' + col, value === 0 ? '' : value);
+        var visibleValue = showValues && value !== 0 ? value : '';
+        pdf2048SetField.call(this, 'cell_' + row + '_' + col, visibleValue);
       }
     }
+  }
+
+  function pdf2048Render() {
+    pdf2048RenderBoard.call(this, true);
     pdf2048SetField.call(this, 'score', pdf2048Score);
     pdf2048SetField.call(this, 'message', pdf2048DisplayMessage());
   }
 
+  function pdf2048RenderBlinkFrame() {
+    pdf2048BlinkFrame += 1;
+    pdf2048RenderBoard.call(pdf2048Document, pdf2048BlinkFrame % 2 === 0);
+    pdf2048SetField.call(pdf2048Document, 'score', pdf2048Score);
+    pdf2048SetField.call(pdf2048Document, 'message', pdf2048DisplayMessage());
+    if (pdf2048BlinkFrame >= ${TERMINAL_BLINK_FRAMES}) {
+      pdf2048ClearBlinkTimer();
+      pdf2048Render.call(pdf2048Document);
+    }
+  }
+
+  function pdf2048StartTerminalBlink() {
+    pdf2048ClearBlinkTimer();
+    pdf2048BlinkFrame = 0;
+    pdf2048Render.call(pdf2048Document);
+    if (typeof app !== 'undefined' && typeof app.setInterval === 'function') {
+      try {
+        pdf2048BlinkTimer = app.setInterval(
+          'pdf2048RenderBlinkFrame();',
+          ${TERMINAL_BLINK_INTERVAL_MS}
+        );
+      } catch (error) {
+        pdf2048BlinkTimer = null;
+      }
+    }
+  }
+
   function startGame2048() {
+    pdf2048ClearBlinkTimer();
     pdf2048Board = pdf2048EmptyBoard();
     pdf2048Score = 0;
     pdf2048State = 'RUNNING';
+    pdf2048SetStartCaption('RESTART');
     pdf2048AddRandomTile(pdf2048Board);
     pdf2048AddRandomTile(pdf2048Board);
     pdf2048Render.call(this);
   }
 
   function resetGame2048() {
+    pdf2048ClearBlinkTimer();
     pdf2048Board = pdf2048EmptyBoard();
     pdf2048Score = 0;
     pdf2048State = 'READY';
+    pdf2048SetStartCaption('START');
     pdf2048Render.call(this);
   }
 
@@ -214,7 +281,7 @@ if (typeof pdf2048Ready === 'undefined') {
     if (!result.moved) {
       if (!pdf2048HasAvailableMoves(pdf2048Board)) {
         pdf2048State = 'GAME_OVER';
-        pdf2048Render.call(this);
+        pdf2048StartTerminalBlink();
       }
       return;
     }
@@ -222,12 +289,14 @@ if (typeof pdf2048Ready === 'undefined') {
     pdf2048Score += result.scoreDelta;
     if (pdf2048ContainsTarget(pdf2048Board)) {
       pdf2048State = 'WIN';
-      pdf2048Render.call(this);
+      pdf2048StartTerminalBlink();
       return;
     }
     pdf2048AddRandomTile(pdf2048Board);
     if (!pdf2048HasAvailableMoves(pdf2048Board)) {
       pdf2048State = 'GAME_OVER';
+      pdf2048StartTerminalBlink();
+      return;
     }
     pdf2048Render.call(this);
   }

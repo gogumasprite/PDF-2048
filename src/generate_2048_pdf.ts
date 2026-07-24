@@ -110,6 +110,7 @@ function addButton(
   script: string,
   width: number,
   height: number,
+  fontSize: number,
 ): void {
   const page = pdfDoc.getPages()[0];
   const button = pdfDoc.getForm().createButton(name);
@@ -123,6 +124,7 @@ function addButton(
     borderColor: color(FRAME_COLOR),
     borderWidth: 1,
   });
+  button.setFontSize(fontSize);
   addJavaScriptAction(button, script);
 }
 
@@ -210,7 +212,7 @@ function addPageGraphics(pdfDoc: PDFDocument): void {
     });
   }
 
-  page.drawText('Click START, then use the direction buttons.', {
+  page.drawText('Click START. It becomes RESTART after the game begins.', {
     x: CONTROL_LEFT,
     y: 458,
     size: 11,
@@ -286,12 +288,13 @@ function addGameButtons(pdfDoc: PDFDocument): void {
   addButton(
     pdfDoc,
     FIELD_NAMES.start,
-    'START / RETRY',
+    'START',
     CONTROL_LEFT,
     320,
     buildStartScript(),
     192,
     38,
+    15,
   );
   addButton(
     pdfDoc,
@@ -302,11 +305,12 @@ function addGameButtons(pdfDoc: PDFDocument): void {
     buildResetScript(),
     92,
     38,
+    13,
   );
-  addButton(pdfDoc, FIELD_NAMES.up, 'UP', CONTROL_LEFT + 118, 263, buildDirectionScript('UP'), 58, 28);
-  addButton(pdfDoc, FIELD_NAMES.left, 'LEFT', CONTROL_LEFT + 52, 227, buildDirectionScript('LEFT'), 58, 28);
-  addButton(pdfDoc, FIELD_NAMES.right, 'RIGHT', CONTROL_LEFT + 184, 227, buildDirectionScript('RIGHT'), 58, 28);
-  addButton(pdfDoc, FIELD_NAMES.down, 'DOWN', CONTROL_LEFT + 118, 191, buildDirectionScript('DOWN'), 58, 28);
+  addButton(pdfDoc, FIELD_NAMES.up, 'UP', CONTROL_LEFT + 118, 263, buildDirectionScript('UP'), 58, 28, 11);
+  addButton(pdfDoc, FIELD_NAMES.left, 'LEFT', CONTROL_LEFT + 52, 227, buildDirectionScript('LEFT'), 58, 28, 11);
+  addButton(pdfDoc, FIELD_NAMES.right, 'RIGHT', CONTROL_LEFT + 184, 227, buildDirectionScript('RIGHT'), 58, 28, 11);
+  addButton(pdfDoc, FIELD_NAMES.down, 'DOWN', CONTROL_LEFT + 118, 191, buildDirectionScript('DOWN'), 58, 28, 11);
 }
 
 async function createPdf(): Promise<PDFDocument> {
@@ -379,6 +383,12 @@ async function verify(outputPath: string): Promise<void> {
     'pdf2048MergeLine',
     'pdf2048AddRandomTile',
     'pdf2048Render',
+    'pdf2048SetStartCaption',
+    'buttonSetCaption',
+    'pdf2048StartTerminalBlink',
+    'pdf2048RenderBlinkFrame',
+    'app.setInterval',
+    'app.clearInterval',
     'resetGame2048',
     "return 'CLEAR!'",
     "return 'FAILED'",
@@ -388,8 +398,8 @@ async function verify(outputPath: string): Promise<void> {
       throw new Error(`Missing runtime snippet: ${snippet}`);
     }
   }
-  if (startScript.includes('fillColor') || startScript.includes('setInterval')) {
-    throw new Error('Runtime must not change fillColor or use setInterval.');
+  if (startScript.includes('fillColor')) {
+    throw new Error('Runtime must not change fillColor.');
   }
   console.log(`Verified ${requiredFields.length} PDF fields and runtime structure.`);
 }
